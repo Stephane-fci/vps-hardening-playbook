@@ -88,7 +88,16 @@ sshd -t
 
 If this shows ANY errors, **DO NOT restart SSH.** Fix the errors first. If you restart with a broken config, SSH may not come back.
 
-### 3.5 — Apply the changes
+### 3.5 — UPDATE FIREWALL FIRST (before restarting SSH!)
+
+**🪤 TRAP: If UFW is active and only allows port 22, changing SSH to port 2222 and restarting will lock you out.** Update the firewall BEFORE restarting SSH:
+
+```bash
+ufw allow 2222/tcp comment "SSH new port"
+# Don't delete the old rule yet — wait until new port is confirmed working
+```
+
+### 3.6 — Apply the changes
 
 ```bash
 # If using socket activation (Ubuntu 24.04):
