@@ -136,4 +136,16 @@ Send this back to the executor or the human. The executor should fix all critica
 
 ---
 
+## Note: Self-Auditing From a Sandboxed Service
+
+If you're an agent auditing your OWN server and your service runs with `NoNewPrivileges=yes` and `ProtectSystem=strict`, some checks will fail because you can't run `sudo`. Specifically:
+- `sudo ufw status` — blocked
+- `sudo fail2ban-client status` — blocked
+
+**This is actually a good sign** — it proves the sandbox is working. But it means these items need to be verified by an external operator (SSH login as admin user) or by the human.
+
+Report what you CAN'T check alongside what you CAN, so the human knows to have someone else verify the rest.
+
+---
+
 *Remember: your goal is not to find fault. It's to make the server actually secure. A clean audit is a great result.*
