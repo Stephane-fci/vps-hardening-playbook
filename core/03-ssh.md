@@ -99,6 +99,8 @@ ufw allow 2222/tcp comment "SSH new port"
 
 ### 3.6 — Apply the changes
 
+**🪤 TRAP: Ubuntu 24.04+ uses `ssh.service`, NOT `sshd.service`.** If you're used to `systemctl restart sshd` from CentOS/RHEL/older Ubuntu, it won't work (or will silently fail). Always use `ssh` on modern Ubuntu/Debian.
+
 ```bash
 # If using socket activation (Ubuntu 24.04):
 systemctl daemon-reload
@@ -108,6 +110,8 @@ systemctl restart ssh
 # If NOT using socket activation:
 systemctl restart ssh
 ```
+
+**Note:** On CentOS/RHEL/Fedora, the service IS `sshd.service`. This trap is Ubuntu/Debian-specific.
 
 ### 3.6 — Verify from a NEW session
 
@@ -136,6 +140,24 @@ ssh root@[SERVER_IP] -p 2222
 # Should fail with "Permission denied"
 ```
 
+### 3.7 — Tune MaxStartups for agent workloads (optional)
+
+If your agent does bulk file transfers over SSH (e.g., deploying workspace files to another VPS), the default `MaxStartups 10:30:60` may throttle connections and cause "connection refused" errors during bursts.
+
+For agent workloads:
+```bash
+# In /etc/ssh/sshd_config, add or update:
+MaxStartups 30:50:100
+MaxSessions 10
+```
+
+Then restart SSH. This allows more concurrent connection attempts before rate-limiting kicks in.
+
+**Default (10:30:60):** Start rejecting 30% of connections after 10 unauthenticated, hard limit at 60.
+**Agent-tuned (30:50:100):** Start rejecting 50% after 30 unauthenticated, hard limit at 100.
+
+Only needed if you're doing multi-file transfers or running multiple parallel SSH commands. For single-agent personal use, the defaults are fine.
+
 ## Rollback
 
 If locked out:
@@ -144,6 +166,11 @@ If locked out:
 3. Restore: `cp /etc/ssh/sshd_config.backup /etc/ssh/sshd_config`
 4. If socket override exists: `rm -rf /etc/systemd/system/ssh.socket.d`
 5. `systemctl daemon-reload && systemctl restart ssh.socket ssh`
+
+**⚠️ Hetzner Console limitation:** If you've disabled password authentication (which you should), you can't log in via the web console either — it uses a terminal emulator that requires password auth. Recovery options:
+- **Hetzner Rescue Mode:** Boot into rescue, mount disk, edit `sshd_config` to re-enable PasswordAuthentication temporarily.
+- **Backup operator user:** See `profiles/single-agent.md` for creating a local recovery account before lockdown.
+- **Snapshot:** If you took a snapshot before hardening, restore it.
 
 ---
 
@@ -158,3 +185,4 @@ If locked out:
 - [ ] New session works on new port with admin user
 - [ ] Root login rejected
 - [ ] Password login rejected
+- [ ] MaxStartups tuned (if agent workloads need it)

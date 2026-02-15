@@ -4,6 +4,19 @@
 
 ---
 
+## 2026-02-15 — SSH Service Name Trap, Agent Tuning, Console Recovery
+
+**Impact:** LOW-MEDIUM — prevents confusion on Ubuntu 24.04+, helps agent deployments
+
+**What:**
+- **SSH service name clarification:** Ubuntu 24.04+ uses `ssh.service`, NOT `sshd.service`. Added explicit trap warning in Step 3.6. People coming from CentOS/RHEL will instinctively type `systemctl restart sshd` — on Ubuntu, that fails silently or doesn't exist.
+- **MaxStartups tuning for agent workloads (Step 3.7):** When deploying workspace files to a VPS via bulk SSH transfers (common in multi-agent setups), the default `MaxStartups 10:30:60` throttles connections. New section with recommended values for agent workloads: `MaxStartups 30:50:100` + `MaxSessions 10`.
+- **Hetzner Console recovery note:** Documented that Hetzner's web console doesn't work with key-only SSH (no password = can't login via console). Added alternative recovery paths: Rescue Mode, backup operator user, snapshots.
+
+**Source:** Deployed fourth production VPS (multi-agent, Hetzner CPX32). Hit MaxStartups throttling during bulk file transfers. Confirmed Hetzner Console limitation firsthand during lockout recovery.
+
+---
+
 ## 2026-02-10b — Trap #8, Sandbox Audit Insight, Two More VPSes
 
 **Impact:** MEDIUM — new trap affects anyone changing SSH port with UFW active
