@@ -88,12 +88,72 @@ Default for new VPSes is hardened public SSH, unless a private network/VPN-only 
 - [ ] Pending reboot marker is checked.
 - [ ] Current high-profile Linux CVEs are checked against package/kernel state when relevant.
 - [ ] Copy Fail / CVE-2026-31431 posture is checked on Ubuntu 24.04-class hosts: patched `kmod` package or explicit `algif_aead` module block exists, `algif_aead` is not loaded, and mitigation evidence is saved.
+- [ ] If Copy Fail is unmitigated, apply the mitigation below before marking the host clean.
 - [ ] Useless server packages are removed, not only stopped.
 - [ ] CUPS is not installed/running unless explicitly needed.
 - [ ] VNC / x11vnc is not running unless explicitly needed and protected.
 - [ ] websockify is not running unless explicitly needed and protected.
 - [ ] Samba/NFS/rpcbind/FTP/telnet are absent unless explicitly needed.
 - [ ] Old dashboards, dev servers, stale cron jobs, and old systemd units are reviewed.
+
+
+### Copy Fail / CVE-2026-31431 mitigation checklist
+
+Copy Fail is a Linux local privilege escalation issue. It is not a remote exploit by itself, but it matters on agent hosts because any local code execution path can become much worse if local privilege escalation is available.
+
+For Ubuntu 24.04-class hosts, verify and mitigate like this:
+
+- [ ] Check OS/kernel/kmod state and save evidence:
+
+```bash
+lsb_release -a 2>/dev/null || cat /etc/os-release
+uname -a
+dpkg-query -W kmod libkmod2 2>/dev/null || true
+lsmod | grep -E '^algif_aead\b' || true
+modprobe -n -v algif_aead 2>&1 || true
+```
+
+- [ ] Preferred fix: install the Ubuntu-patched `kmod`/`libkmod2` packages when available.
+
+```bash
+apt-get update
+apt-get install --only-upgrade kmod libkmod2
+```
+
+- [ ] If apt/dpkg is locked, first determine whether it is a live update or a stale lock. Do **not** kill active package work blindly. If it is stale, clear it deliberately, then finish dpkg before retrying package updates.
+
+```bash
+ps -fp <APT_OR_DPKG_PID>
+dpkg --configure -a
+apt-get -f install
+```
+
+- [ ] Add or keep an explicit module block for defense in depth:
+
+```bash
+printf 'install algif_aead /bin/false\nblacklist algif_aead\n' > /etc/modprobe.d/disable-algif_aead.conf
+```
+
+- [ ] Verify the module is not loaded and cannot be loaded:
+
+```bash
+lsmod | grep -E '^algif_aead\b' && echo 'FAIL: algif_aead loaded' || echo 'PASS: algif_aead not loaded'
+modprobe algif_aead && echo 'FAIL: algif_aead load succeeded' || echo 'PASS: algif_aead blocked'
+```
+
+- [ ] If a newer kernel was installed, schedule a controlled reboot and verify the running kernel afterward. A package/module mitigation can make the host safe enough short-term, but a pending kernel reboot should remain visible.
+
+```bash
+uname -r
+ls /boot/vmlinuz-* 2>/dev/null | sort -V | tail
+```
+
+Classification:
+
+- **PASS** — patched `kmod`/`libkmod2` installed or explicit `algif_aead` block exists, `algif_aead` is not loaded, and loading it fails.
+- **WARN** — module blocked but newer kernel is installed and not yet running; schedule controlled reboot.
+- **FAIL** — no patched package, no explicit module block, or `algif_aead` can still load.
+- **INVESTIGATE** — package manager lock, unknown distro status, or custom kernel/module behavior.
 
 ## 5. Kernel and runtime hardening
 

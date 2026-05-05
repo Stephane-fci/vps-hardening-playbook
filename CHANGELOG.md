@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-05-05 — Add Copy Fail mitigation procedure
+
+- Expanded `OPENCLAW-SECURITY-CHECKLIST.md` with a concrete Copy Fail / CVE-2026-31431 mitigation checklist.
+- Added package update guidance for patched `kmod`/`libkmod2`, explicit `algif_aead` module blocking, verification commands, apt/dpkg lock caution, and reboot follow-up classification.
+
+
 ## 2026-05-05 — OpenClaw security checklist refresh
 
 - Added `OPENCLAW-SECURITY-CHECKLIST.md` as the current reusable VPS/OpenClaw audit checklist.
