@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2026-05-05 — OpenClaw security checklist refresh
+
+- Added `OPENCLAW-SECURITY-CHECKLIST.md` as the current reusable VPS/OpenClaw audit checklist.
+- Added `OPENCLAW-NEW-VPS-PRODUCTION-SETUP.md` for the empty-VPS-to-production OpenClaw roadmap.
+- Added newer operating rules: classify OpenClaw WARN labels, document accepted risk, page on unknown WARNs, keep self-audits per-agent/local, and include Copy Fail / CVE-2026-31431 posture checks for Ubuntu 24.04-class hosts.
+- Updated `README.md` to point fresh deployments and audits to the new OpenClaw-specific docs.
+
+
 *Every update to this playbook. Existing deployments: read this to find what's new since your last check.*
 
 ---

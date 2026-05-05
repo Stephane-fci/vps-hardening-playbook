@@ -21,9 +21,10 @@ Both paths use the same playbook. The only difference is where you're running fr
 
 ### If you're setting up a FRESH VPS:
 1. Read this README (you're here)
-2. Read `SETUP-GUIDE.md` — follow it step by step
-3. The setup guide references `core/` files for each topic (SSH, firewall, etc.)
-4. At the end, run the independent audit (see `audit/`)
+2. Read `OPENCLAW-NEW-VPS-PRODUCTION-SETUP.md` for the current OpenClaw production roadmap
+3. Read `SETUP-GUIDE.md` — follow it step by step
+4. The setup guide references `core/` files for each topic (SSH, firewall, etc.)
+5. At the end, run the independent audit (see `audit/`)
 
 ### If you're checking an EXISTING deployment for updates:
 1. Read `CHANGELOG.md` — find entries newer than your last check
@@ -31,9 +32,10 @@ Both paths use the same playbook. The only difference is where you're running fr
 3. Propose changes to your human before applying anything
 
 ### If you're auditing someone else's work:
-1. Read `audit/AUDIT-PROTOCOL.md` — the full verification checklist
-2. You should have received an audit prompt with SSH access details
-3. Run the checks, report findings
+1. Read `OPENCLAW-SECURITY-CHECKLIST.md` — the current scoring checklist
+2. Read `audit/AUDIT-PROTOCOL.md` — the verification protocol
+3. You should have received an audit prompt with SSH access details
+4. Run the checks, report findings
 
 ---
 
@@ -44,6 +46,8 @@ README.md                  ← You are here
 CHANGELOG.md               ← What's changed (sync mechanism for existing deployments)
 UPDATE-PROTOCOL.md         ← How to check for and apply updates
 SETUP-GUIDE.md             ← Step-by-step for fresh VPS hardening
+OPENCLAW-SECURITY-CHECKLIST.md ← Updated OpenClaw/VPS audit checklist
+OPENCLAW-NEW-VPS-PRODUCTION-SETUP.md ← Empty VPS → secure OpenClaw production roadmap
 
 core/                      ← Universal hardening (applies to every VPS)
   00-preparation.md        ← Backup, access verification, questions to ask
